@@ -1,0 +1,15 @@
+DFRobot_usbd_cdc.c:415:17:DFR_USBD_CDC_Init	24	static
+DFRobot_usbd_cdc.c:493:17:DFR_USBD_CDC_DeInit	24	static
+DFRobot_usbd_cdc.c:527:17:DFR_USBD_CDC_Setup	32	static
+DFRobot_usbd_cdc.c:621:17:DFR_USBD_CDC_DataIn	24	static
+DFRobot_usbd_cdc.c:655:17:DFR_USBD_CDC_DataOut	24	static
+DFRobot_usbd_cdc.c:682:17:DFR_USBD_CDC_EP0_RxReady	24	static
+DFRobot_usbd_cdc.c:704:18:DFR_USBD_CDC_GetFSCfgDesc	16	static
+DFRobot_usbd_cdc.c:717:18:DFR_USBD_CDC_GetHSCfgDesc	16	static
+DFRobot_usbd_cdc.c:730:18:DFR_USBD_CDC_GetOtherSpeedCfgDesc	16	static
+DFRobot_usbd_cdc.c:742:11:DFR_USBD_CDC_GetDeviceQualifierDescriptor	16	static
+DFRobot_usbd_cdc.c:754:10:DFR_USBD_CDC_RegisterInterface	24	static
+DFRobot_usbd_cdc.c:774:10:DFR_USBD_CDC_SetTxBuffer	32	static
+DFRobot_usbd_cdc.c:793:10:DFR_USBD_CDC_SetRxBuffer	24	static
+DFRobot_usbd_cdc.c:809:10:DFR_USBD_CDC_TransmitPacket	24	static
+DFRobot_usbd_cdc.c:847:10:DFR_USBD_CDC_ReceivePacket	24	static

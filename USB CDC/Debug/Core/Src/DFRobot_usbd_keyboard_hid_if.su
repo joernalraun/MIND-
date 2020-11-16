@@ -1,0 +1,3 @@
+DFRobot_usbd_keyboard_hid_if.c:191:15:DFR_KEYBOARD_HID_Init_FS	4	static
+DFRobot_usbd_keyboard_hid_if.c:202:15:DFR_KEYBOARD_HID_DeInit_FS	4	static
+DFRobot_usbd_keyboard_hid_if.c:215:15:DFR_KEYBOARD_HID_OutEvent_FS	16	static

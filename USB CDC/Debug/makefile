@@ -36,6 +36,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 USB\ CDC.list \
 
+OBJCOPY_HEX += \
+USB\ CDC.hex \
+
 OBJCOPY_BIN += \
 USB\ CDC.bin \
 
@@ -59,6 +62,11 @@ USB\ CDC.list: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+USB\ CDC.hex: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "USB CDC.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 USB\ CDC.bin: $(EXECUTABLES)
 	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "USB CDC.bin"
 	@echo 'Finished building: $@'
@@ -69,7 +77,7 @@ clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 .PHONY: all clean dependents
 .SECONDARY:

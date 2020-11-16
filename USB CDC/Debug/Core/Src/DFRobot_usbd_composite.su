@@ -1,0 +1,8 @@
+DFRobot_usbd_composite.c:384:17:DFR_USBD_Composite_Init	24	static
+DFRobot_usbd_composite.c:405:17:DFR_USBD_Composite_DeInit	24	static
+DFRobot_usbd_composite.c:421:17:DFR_USBD_Composite_EP0_RxReady	16	static
+DFRobot_usbd_composite.c:436:17:DFR_USBD_Composite_Setup	16	static
+DFRobot_usbd_composite.c:491:10:DFR_USBD_Composite_DataIn	16	static
+DFRobot_usbd_composite.c:521:10:DFR_USBD_Composite_DataOut	16	static
+DFRobot_usbd_composite.c:551:11:DFR_USBD_Composite_GetFSCfgDesc	16	static
+DFRobot_usbd_composite.c:563:11:DFR_USBD_Composite_GetDeviceQualifierDescriptor	16	static

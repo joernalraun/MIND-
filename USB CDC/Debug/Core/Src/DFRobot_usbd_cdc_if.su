@@ -1,0 +1,6 @@
+core_cm3.h:1762:34:__NVIC_SystemReset	4	static,ignoring_inline_asm
+DFRobot_usbd_cdc_if.c:100:15:DFR_CDC_Init_FS	8	static
+DFRobot_usbd_cdc_if.c:114:15:DFR_CDC_DeInit_FS	4	static
+DFRobot_usbd_cdc_if.c:143:15:DFR_CDC_Control_FS	16	static
+DFRobot_usbd_cdc_if.c:225:15:DFR_CDC_Receive_FS	16	static
+DFRobot_usbd_cdc_if.c:251:9:DFR_CDC_Transmit_FS	24	static

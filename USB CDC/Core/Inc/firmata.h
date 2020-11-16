@@ -10,6 +10,7 @@
 #define INC_FIRMATA_H_
 #include "stm32f1xx_hal.h"
 #include "BMI160.h"
+#include "HuskyLens.h"
 #include "math.h"
 
 #define     FIRMATA_MAJOR             0x02
@@ -86,7 +87,7 @@
 //DFRobot私有协议
 #define DFROBOT_MESSAGE             0x0D
 #define SUB_MESSAGE_DFROBOT_REPORTS 0x0A
-
+//陀螺仪
 #define SUB_MESSAGE_GYROSCOPE       0x00
 #define GYROSCOPE_BEGIN 			0x00
 #define GYROSCOPE_GET_MESSAGE 		0x01
@@ -96,15 +97,29 @@
 #define GYROSCOPE_GET_Y 			0x02
 #define GYROSCOPE_GET_Z 			0x03
 
+//哈士奇
 #define SUB_MESSAGE_HUKSYLENS       0x01
-#define SUB_MESSAGE_TONE            0x02
-#define SUB_MESSAGE_PULSE           0x03
-#define SUB_MESSAGE_MILLIS          0x04
-#define SUB_MESSAGE_DHT             0x0D
-#define SUB_MESSAGE_I2CSCAN         0x0E
-#define SUB_MESSAGE_DS18B20         0x11
-#define SUB_MESSAGE_VIBRATION       0x15
-#define SUB_MESSAGE_LED				0x17
+#define HUKSYLENS_CHANGE_MODE		0x00
+#define HUKSYLENS_REQUEST			0x01
+#define HUKSYLENS_GET_TOTAL_ID		0x02
+#define HUKSYLENS_ISAPPEARDIRECT	0x03
+#define HUKSYLENS_CENTER_ID			0x04
+#define HUKSYLENS_ID_LEARN			0x05
+#define HUKSYLENS_ISAPPEAR			0x06
+#define HUKSYLENS_GET_NUM_PARAMETER 0x07
+#define HUKSYLENS_READCOUNT			0x08
+#define HUKSYLENS_ID_NUM_PARAMETER  0x09
+#define HUKSYLENS_LEARN_ONECE       0x0A
+#define HUKSYLENS_FORGET_LEARN      0x0B
+#define HUKSYLENS_WRITE_NAME		0x0C
+#define HUKSYLENS_WRITEOSD			0x0D
+#define HUKSYLENS_CLEAR_SCREEN		0x0E
+#define HUKSYLENS_TAKEPHOTOTOSDCARD 0x0F
+#define HUKSYLENS_SAVEMODELTOTFCARD 0x10
+
+#define SUB_MESSAGE_MOTOR			0x02
+
+#define SUB_MESSAGE_CHANGE_KEYBOARD 0x03
 
 #define    TOTAL_PINS               2//PA6,PA7
 uint8_t pinConfig[TOTAL_PINS];
@@ -121,6 +136,22 @@ uint8_t allowBufferUpdate;
 uint8_t analogInputsToReport = 0;//用来存储哪些模拟口需要上报的，以位判断，每一位代表一个模拟口
 
 char *myname = "DFRobot firmata\0";
+
+uint8_t key_up[8]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+uint8_t a_down[8]={0x00,0x00,0x04,0x00,0x00,0x00,0x00,0x00};
+uint8_t d_down[8]={0x00,0x00,0x07,0x00,0x00,0x00,0x00,0x00};
+
+uint8_t w_down[8]={0x00,0x00,0x1a,0x00,0x00,0x00,0x00,0x00};
+uint8_t s_down[8]={0x00,0x00,0x16,0x00,0x00,0x00,0x00,0x00};
+
+uint8_t j_down[8]={0x00,0x00,0xD,0x00,0x00,0x00,0x00,0x00};
+uint8_t k_down[8]={0x00,0x00,0xE,0x00,0x00,0x00,0x00,0x00};
+uint8_t l_down[8]={0x00,0x00,0xF,0x00,0x00,0x00,0x00,0x00};
+uint8_t i_down[8]={0x00,0x00,0xC,0x00,0x00,0x00,0x00,0x00};
+uint8_t o_down[8]={0x00,0x00,0x12,0x00,0x00,0x00,0x00,0x00};
+uint8_t p_down[8]={0x00,0x00,0x13,0x00,0x00,0x00,0x00,0x00};
+uint8_t space_down[8]={0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x00};
 
 typedef void (*dataBufferOverflowCallbackFunction)(void * context);
 dataBufferOverflowCallbackFunction currentDataBufferOverflowCallback;

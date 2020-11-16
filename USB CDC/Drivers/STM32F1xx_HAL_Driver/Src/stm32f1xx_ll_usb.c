@@ -2116,7 +2116,7 @@ HAL_StatusTypeDef USB_EPStartXfer(USB_TypeDef *USBx, USB_EPTypeDef *ep)
   uint32_t len;
   uint16_t pmabuffer;
   uint16_t wEPVal;
-
+uint8_t a=0x98;
   /* IN endpoint */
   if (ep->is_in == 1U)
   {

@@ -1,0 +1,12 @@
+DFRobot_usbd_keyboard_hid.c:281:17:DFR_USBD_KEYBOARD_HID_Init	24	static
+DFRobot_usbd_keyboard_hid.c:327:17:DFR_USBD_KEYBOARD_HID_DeInit	16	static
+DFRobot_usbd_keyboard_hid.c:355:17:DFR_USBD_KEYBOARD_HID_Setup	40	static
+DFRobot_usbd_keyboard_hid.c:476:9:DFR_USBD_KEYBOARD_HID_SendReport	32	static
+DFRobot_usbd_keyboard_hid.c:504:18:DFR_USBD_KEYBOARD_HID_GetFSCfgDesc	16	static
+DFRobot_usbd_keyboard_hid.c:517:18:DFR_USBD_KEYBOARD_HID_GetHSCfgDesc	16	static
+DFRobot_usbd_keyboard_hid.c:530:18:DFR_USBD_KEYBOARD_HID_GetOtherSpeedCfgDesc	16	static
+DFRobot_usbd_keyboard_hid.c:543:17:DFR_USBD_KEYBOARD_HID_DataIn	16	static
+DFRobot_usbd_keyboard_hid.c:560:17:DFR_USBD_KEYBOARD_HID_DataOut	24	static
+DFRobot_usbd_keyboard_hid.c:581:16:DFR_USBD_KEYBOARD_HID_EP0_RxReady	24	static
+DFRobot_usbd_keyboard_hid.c:601:18:DFR_USBD_KEYBOARD_HID_GetDeviceQualifierDesc	16	static
+DFRobot_usbd_keyboard_hid.c:613:10:DFR_USBD_KEYBOARD_HID_RegisterInterface	24	static
