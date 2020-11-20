@@ -30,7 +30,14 @@ Core/Src/firmata.o: ../Core/Src/firmata.c ../Core/Inc/firmata.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- ../Core/Inc/BMI160.h ../Core/Inc/HuskyLens.h
+ ../Core/Inc/BMI160.h ../Core/Inc/HuskyLens.h \
+ ../Core/Inc/DFRobot_usbd_cdc_if.h ../Core/Inc/DFRobot_usbd_cdc.h \
+ ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
+ ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
+ ../USB_DEVICE/Target/usbd_conf.h ../Core/Inc/main.h \
+ ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
+ ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
+ ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
 
 ../Core/Inc/firmata.h:
 
@@ -99,3 +106,21 @@ Core/Src/firmata.o: ../Core/Src/firmata.c ../Core/Inc/firmata.h \
 ../Core/Inc/BMI160.h:
 
 ../Core/Inc/HuskyLens.h:
+
+../Core/Inc/DFRobot_usbd_cdc_if.h:
+
+../Core/Inc/DFRobot_usbd_cdc.h:
+
+../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
+
+../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h:
+
+../USB_DEVICE/Target/usbd_conf.h:
+
+../Core/Inc/main.h:
+
+../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h:
+
+../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
+
+../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h:

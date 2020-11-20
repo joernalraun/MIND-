@@ -96,8 +96,8 @@ extern uint32_t my_RxLength;
 extern USBD_HandleTypeDef hUsbDeviceFS;
 uint8_t flag0=0;
 uint8_t flag1=0;
-static float old_x=0;
-static float old_y=0;
+static float old_x=1.6;
+static float old_y=1.6;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -247,7 +247,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 void reportAnalogstick(){
-	if(fabs(old_x-ad0)>1){
+	if(fabs(old_x-ad0)>=1){
+//		HAL_Delay(1);
+		printf("old_x==%f\n",old_x);
+		printf("ad0==%f\n",ad0);
 		if(ad0<0.6){
 			old_x=ad0;
 			DFR_USBD_KEYBOARD_HID_SendReport(&hUsbDeviceFS,a_down,8);
@@ -261,7 +264,10 @@ void reportAnalogstick(){
 
 	}
 
-	if(fabs(old_y-ad1)>1){
+	if(fabs(old_y-ad1)>=1){
+//		HAL_Delay(1);
+		printf("old_y==%f\n",old_y);
+		printf("ad1==%f\n",ad1);
 		if(ad1<0.6){
 			old_y=ad1;
 			DFR_USBD_KEYBOARD_HID_SendReport(&hUsbDeviceFS,s_down,8);
@@ -309,7 +315,6 @@ void BMI160test(void){
 }
 
 void HUKSYLENS_test(){
-
 }
 
 void M_TEST(){
@@ -384,15 +389,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   HAL_ADC_Start_DMA(&hadc1,ADC_Value,100);
-  while(1){
-	  if(ad0!=0){
-		  old_x=ad0;
-		  old_y=ad1;
-		  break;
-	  }
-  }
-  while (1)
-  {
+  while (1){
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -409,8 +406,7 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void){
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};

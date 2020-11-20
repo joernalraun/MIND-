@@ -142,6 +142,7 @@ static int8_t DFR_CDC_DeInit_FS(void)
   */
 static int8_t DFR_CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
+	static uint8_t count;
   /* USER CODE BEGIN 5 */
   switch(cmd)
   {
@@ -184,7 +185,12 @@ static int8_t DFR_CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /*******************************************************************************/
     case DFR_CDC_SET_LINE_CODING:
     	if(pbuf[0]+(pbuf[1]<<8)==1200)
-    		NVIC_SystemReset();
+    	{
+    		if(count>4){
+    			NVIC_SystemReset();
+    		}else
+    			count++;
+    	}
     break;
 
     case DFR_CDC_GET_LINE_CODING:

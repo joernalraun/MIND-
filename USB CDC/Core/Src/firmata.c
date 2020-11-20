@@ -5,11 +5,13 @@
  *      Author: Administrator
  */
 #include "firmata.h"
+#include "string.h"
+#include <DFRobot_usbd_cdc_if.h>
 #if 1
 static void reoprt_sysex(uint8_t command, uint8_t argc, uint8_t *argv){
 	uint8_t mode = 0;
 	uint8_t txbuffer[50]={0xf0,0x0d,0};
-	uint8_t TOTAL_ID;
+	int16_t TOTAL_ID;
 	uint8_t ISAPPEARDIRECT;
 	uint8_t isLearn;
 	uint8_t ISAPPEAR;
@@ -125,7 +127,7 @@ static void reoprt_sysex(uint8_t command, uint8_t argc, uint8_t *argv){
 							if(argv[2]==0){
 								CENTER_Block_DATA=readBlockCenterParameterDirect();
 							}else if(argv[2]==1){
-//								CENTER_Arrow_DATA=readArrowCenterParameterDirect();
+								readArrowCenterParameterDirect(&CENTER_Arrow_DATA);
 							}else{
 								;
 							}
@@ -400,7 +402,7 @@ static void reoprt_sysex(uint8_t command, uint8_t argc, uint8_t *argv){
 	}
 }
 
-static void sendFirmwareVersion(uint8_t major, uint8_t minor, size_t bytec, uint8_t *bytev){
+void sendFirmwareVersion(uint8_t major, uint8_t minor, size_t bytec, uint8_t *bytev){
 	uint8_t msg[5]={START_SYSEX,REPORT_FIRMWARE,major,minor,END_SYSEX};
 	DFR_CDC_Transmit_FS(msg,5);
 }
@@ -409,9 +411,9 @@ static void sendFirmwareVersion(uint8_t major, uint8_t minor, size_t bytec, uint
  * 上报版本信息
  */
 static void reoprt_firmware(){
-	const size_t major_version_offset = 1;
-	const size_t minor_version_offset = 2;
-	const size_t string_offset = 3;
+//	const size_t major_version_offset = 1;
+//	const size_t minor_version_offset = 2;
+//	const size_t string_offset = 3;
 	if(sysexBytesRead < 3){/*错误格式，用于Firmata V3.0.0 */
 		sendFirmwareVersion(FIRMATA_MAJOR, FIRMATA_MINOR, strlen(myname), (uint8_t *)myname);
 	}
@@ -463,55 +465,6 @@ static void firmata_setDigitalPinValue(uint8_t pin, int value){
 
 	}
 }
-
-/************************************************************************/
-/*                          模拟口相关操作                               */
-/************************************************************************/
-
-
-
-static void testReportAnalog(){
-	uart_write(0xe2);
-	uart_write(0x17);
-	uart_write(0x05);
-}
-
-
-/**
- * 设置哪些模拟口需要上报数据
- */
-static void firmata_setReportAnalog(uint8_t analogPin, int value){
-}
-
-/**
- * 解析处理firmata协议包里的模拟口的操作
- * pin =(0~5),对应A0~A5
- */
-static void firmata_analogWrite(uint8_t pin, uint8_t duty,int freq){
-	if(pin < TOTAL_PINS){
-		switch(getPinMode(pin)){
-			case PIN_MODE_SERVO:
-				break;
-			case PIN_MODE_PWM:
-				break;
-			}
-		}
-}
-
-/**
- * 根据firmata协议打包模拟量数据并上传
- */
-void firmata_sendAnalog(uint8_t pin, uint16_t value){
-	if((0xF >= pin) && (0x3FFF >= value)){
-		uart_write(ANALOG_MESSAGE|pin);
-		encodeByteStream(sizeof(value),(uint8_t *)&value,sizeof(value));
-	}else{
-		uart_write(0xFF);
-		uart_write(0xFF);
-		uart_write(0xFF);
-	}
-}
-
 /**
  * 从dataBuffer中解析接收到的完整数据包
  */

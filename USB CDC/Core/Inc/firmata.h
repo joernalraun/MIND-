@@ -160,7 +160,7 @@ void * currentDataBufferOverflowCallbackContext;
 void firmata_processSysexMessage(void);
 uint8_t firmata_bufferDataAtPosition(const uint8_t data, const size_t pos);
 void firmata_parse(uint8_t* inputData,uint8_t datalen);
-
+void sendFirmwareVersion(uint8_t major, uint8_t minor, size_t bytec, uint8_t *bytev);
 #endif /* INC_FIRMATA_H_ */
 
 #endif

@@ -88,17 +88,26 @@ pFunction jump_To_Application;
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern uint8_t my_RxBuf[512];
+//extern uint8_t FIFOBUFFER[10000];
+//extern uint16_t head;
+//extern uint16_t tail;
+
+extern uint8_t my_RxBuf[64];
 extern uint8_t flag2;
+extern uint8_t flag3;
 extern uint32_t my_RxLength;
-int valid_data=0;
-uint32_t writeFlashData[512];
-uint32_t addr = 0x0800e000;//�?????大�??3E800
+extern uint32_t SIZE;
+extern int valid_data;
+extern uint32_t writeFlashData[512];
+uint32_t addr = 0x0800e000;
 uint32_t print_addr=0x0800e000;
 uint32_t temp1=0;
-uint32_t temp_count=0;
-uint32_t count=0;
+extern uint32_t temp_count;
+extern uint32_t count=0;
 uint8_t flash_flag=0;
+uint8_t flag=0;
+
+
 
 void userAppStart(void){
 	  for(int i=0;i<2;i++){
@@ -107,6 +116,10 @@ void userAppStart(void){
 		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0,0);
 		  HAL_Delay(1000);
 	  }
+    for(int i = 0; i < 8; i++) {
+	   NVIC->ICER[i] = 0xFFFFFFFF; // 关闭中断
+	   NVIC->ICPR[i] = 0xFFFFFFFF; // 清除中断标志位
+    }
 	if(((*(__IO uint32_t *)ApplicationAddress) & 0x2FFE0000) == 0x20000000){
 		jumpAddress = *(__IO uint32_t *)(ApplicationAddress +4);
 		jump_To_Application  = (pFunction) jumpAddress;
@@ -115,52 +128,41 @@ void userAppStart(void){
 	}
 }
 
-void flashtest(){
-    //1、解锁FLASH
+void erasureflash(uint8_t page){
 	HAL_FLASH_Unlock();
 	//2、擦除FLASH
 	//初始化FLASH_EraseInitTypeDef
 	FLASH_EraseInitTypeDef f;
 	f.TypeErase = FLASH_TYPEERASE_PAGES;
 	f.PageAddress = addr;
-	f.NbPages = 2;
+	f.NbPages = page;
 	//设置PageError
 	uint32_t PageError = 0;
 	//调用擦除函数
 	HAL_FLASHEx_Erase(&f, &PageError);
-	//3、对FLASH烧写
-	for(int i=0;i<1024;i++){
-		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, 0x12345678);
-		addr+=4;
-	}
-//	f.TypeErase = FLASH_TYPEERASE_PAGES;
-//	f.PageAddress = 0x0800e000;
-//	f.NbPages = 1;
-//	//调用擦除函数
-//	HAL_FLASHEx_Erase(&f, &PageError);
-	//4、锁住FLASH
 	HAL_FLASH_Lock();
-		for(int i=0;i<1024;i++){
-		  uint32_t temp = *(__IO uint32_t*)(print_addr);
-		  printf("addr:0x%x, data:0x%x\r\n", print_addr, temp);
-		  print_addr+=4;
-		}
-		print_addr=0x0800e000;
+}
+
+void writeFlash(int data){
+//	HAL_FLASH_Unlock();
+	HAL_FLASH_Program(TYPEPROGRAM_WORD, addr,data);
+	addr+=4;
+//	HAL_FLASH_Lock();
 }
 
 void writeFlashTest(void){
     //1、解锁FLASH
 	HAL_FLASH_Unlock();
-	//2、擦除FLASH
-	//初始化FLASH_EraseInitTypeDef
-	FLASH_EraseInitTypeDef f;
-	f.TypeErase = FLASH_TYPEERASE_PAGES;
-	f.PageAddress = addr;
-	f.NbPages = 1;
-	//设置PageError
-	uint32_t PageError = 0;
-	//调用擦除函数
-	HAL_FLASHEx_Erase(&f, &PageError);
+//	//2、擦除FLASH
+//	//初始化FLASH_EraseInitTypeDef
+//	FLASH_EraseInitTypeDef f;
+//	f.TypeErase = FLASH_TYPEERASE_PAGES;
+//	f.PageAddress = addr;
+//	f.NbPages = 1;
+//	//设置PageError
+//	uint32_t PageError = 0;
+//	//调用擦除函数
+//	HAL_FLASHEx_Erase(&f, &PageError);
 	//3、对FLASH烧写
 	for(int i=0;i<valid_data;i++){
 		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, writeFlashData[i]);
@@ -172,30 +174,43 @@ void writeFlashTest(void){
 //FLASH读取数据测试
 void printFlashTest(void){
 #if 1
-	for(int i=0;i<(valid_data);i++){
+	for(int i=0;i<19284;i++){//19284 valid_data
 	  uint32_t temp = *(__IO uint32_t*)(print_addr);
-	  printf("addr:0x%x, data:0x%x\r\n", print_addr, temp);
+	  printf("addr:0x%lx, data:0x%lx\r\n", print_addr, temp);
 	  print_addr+=4;
 	}
 #endif
 }
 
+int c;
 void  firmware_update(){
+  if(flag3==1){
+	  flash_flag=0;
+	  erasureflash(SIZE);
+	  flag3=0;
+  }
   if(flag2==1){
-	HAL_TIM_Base_Stop_IT((TIM_HandleTypeDef *)&htim1);
+	  flash_flag=0;
+	  HAL_TIM_Base_Stop_IT((TIM_HandleTypeDef *)&htim1);
+	  if(my_RxLength<64){
+		  writeFlashTest();
+//		  printFlashTest();
+		  userAppStart();
+	  }else{
+		  writeFlashTest();
+//		  printFlashTest();
+	  }
+	  /*
 	if(my_RxLength<64){
 		valid_data=my_RxLength/4+count;
 		for(int i=0;i<(my_RxLength/4);i++){
 			temp1=0;
-			for(int j=4;j>0;j--){
+			for(int j=0;j<4;j++){
 				temp1 |= ((my_RxBuf[4*i+j])<<(8*j));
 			}
 			writeFlashData[temp_count++]=temp1;
-			count++;
 		}
 		writeFlashTest();
-		printFlashTest();
-		HAL_Delay(3000);
 		userAppStart();
 	}else{
 		for(int i=0;i<(my_RxLength/4);i++){
@@ -207,24 +222,27 @@ void  firmware_update(){
 			count++;
 		}
 		if(temp_count>511){
+			c++;
+			printf("c==%d\n",c*2048);
 			valid_data=count;
 			writeFlashTest();
-			printFlashTest();
 			temp_count=0;
 			count=0;
 		}
 	}
+	*/
 	flag2=0;
   }
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance==TIM1){
-		if(flash_flag>1)
-			HAL_TIM_Base_Stop_IT((TIM_HandleTypeDef *)&htim1);
+		if(flash_flag>0)
+		  HAL_TIM_Base_Stop_IT((TIM_HandleTypeDef *)&htim1);
 		flash_flag++;
 	}
 }
+
 
 /* USER CODE END 0 */
 
@@ -261,17 +279,19 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11,1);
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   HAL_TIM_Base_Start_IT((TIM_HandleTypeDef *)&htim1);
+//  printFlashTest();
   while (1)
   {
-	  if(flash_flag>2)
-		  userAppStart();
+	if(flash_flag>1)
+	  userAppStart();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  firmware_update();
+	firmware_update();
 
   }
   /* USER CODE END 3 */
@@ -287,7 +307,7 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -300,7 +320,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -411,15 +431,25 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PA7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB0 */
   GPIO_InitStruct.Pin = GPIO_PIN_0;
@@ -480,7 +510,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

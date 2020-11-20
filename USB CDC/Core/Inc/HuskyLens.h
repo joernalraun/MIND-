@@ -27,18 +27,6 @@
 
 #define IS_BIG_ENDIAN() (!*(uint8_t *)&(uint16_t){1})
 
-static uint8_t send_buffer[FRAME_BUFFER_SIZE];
-static uint8_t receive_buffer[FRAME_BUFFER_SIZE];
-
-static short send_index = 0;
-static short receive_index = 0;
-
-static uint8_t send_fail = 0;
-static uint8_t receive_fail = 0;
-
-static short content_current = 0;
-static short content_end = 0;
-static uint8_t content_read_end = 0;
 
 I2C_HandleTypeDef hi2c2;
 
@@ -52,8 +40,6 @@ I2C_HandleTypeDef hi2c2;
         return protocolRead##type(protocol, command);  \
     }
 
-static uint8_t send_buffer[FRAME_BUFFER_SIZE];
-static uint8_t receive_buffer[FRAME_BUFFER_SIZE];
 
 enum protocolAlgorithm{
     ALGORITHM_FACE_RECOGNITION=0,
@@ -176,7 +162,6 @@ typedef struct HUSKYLENSArrowInfo_t
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-
 uint8_t writeAlgorithm(enum protocolAlgorithm algorithmType);
 uint8_t wait(uint8_t command);
 uint8_t protocolAvailable();
@@ -231,6 +216,16 @@ uint8_t saveModelToTFCard(uint16_t index);
 HUSKYLENSArrowInfo readArrowParameter(int ID, int index);
 HUSKYLENSResult arrowsread(int ID, int index);
 uint8_t loadModelFromTFCard(uint16_t index);
+void readArrowCenterParameterDirect(HUSKYLENSArrowDirectInfo*arrow);
+
+int16_t readLearnedIDCount();
+uint8_t request();
+uint8_t writeOSD(const char* text, int x, int y);
+uint8_t clearOSD();
+int husky_lens_protocol_write_end();
+void husky_lens_protocol_write_int16(int16_t content);
+uint32_t husky_lens_protocol_read_buffer_uint8(uint8_t *content, uint32_t length);
+int available();
 
 void readreg(uint8_t iic_addr,uint8_t reg_addr, uint8_t *data, uint16_t len);
 void writereg(uint8_t iic_addr,uint8_t reg_addr, uint8_t *data, uint16_t len);

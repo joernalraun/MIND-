@@ -31,20 +31,26 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
- uint8_t my_RxBuf[256];
+ uint8_t my_RxBuf[64];
  uint8_t flag2;
+ uint8_t flag3;
  uint32_t my_RxLength;
+ uint32_t SIZE;
+ uint32_t writeFlashData[512];
+ uint32_t temp_count;
+ uint32_t count;
+ int valid_data;
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @brief For Usb device.
   * @{
   */
-  
+
 /** @defgroup USBD_CDC_IF USBD_CDC_IF
   * @brief Usb VCP device module
   * @{
-  */ 
+  */
 
 /** @defgroup USBD_CDC_IF_Exported_Defines USBD_CDC_IF_Exported_Defines
   * @brief Defines.

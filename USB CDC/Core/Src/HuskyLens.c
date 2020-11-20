@@ -5,9 +5,21 @@
  *      Author: Administrator
  */
 #include "HuskyLens.h"
+#include "stdlib.h"
+#include "string.h"
 Protocol_t protocolInfo;
 Protocol_t *protocolPtr = NULL;
+static uint8_t send_buffer[FRAME_BUFFER_SIZE];
+static uint8_t receive_buffer[FRAME_BUFFER_SIZE];
+static short send_index = 0;
+static short receive_index = 0;
 
+static uint8_t send_fail = 0;
+static uint8_t receive_fail = 0;
+
+static short content_current = 0;
+static short content_end = 0;
+static uint8_t content_read_end = 0;
 HUSKYLENSResult resultDefault;
 
 PROTOCOL_CREATE(Request, Command, COMMAND_REQUEST)
@@ -194,7 +206,7 @@ uint8_t* husky_lens_protocol_write_begin(uint8_t command){
      send_buffer[ADDRESS_INDEX] = 0x11;
      send_buffer[COMMAND_INDEX] = command;
      send_index = CONTENT_INDEX;
-     return &send_buffer;
+     return send_buffer;
  }
 
  void protocolWriteFiveInt16(Protocol_t* protocol, uint8_t command){
@@ -240,7 +252,7 @@ uint8_t* husky_lens_protocol_write_begin(uint8_t command){
      if (content_current >= content_end || content_read_end){receive_fail = 1; return 0;}
      int16_t result;
      memcpy(&result, receive_buffer + content_current, sizeof(result));
-     if (IS_BIG_ENDIAN()){__builtin_bswap16(result);}
+//     if (IS_BIG_ENDIAN()){__builtin_bswap16(result);}
      content_current += sizeof(result);
      return result;
  }
@@ -255,7 +267,7 @@ uint8_t* husky_lens_protocol_write_begin(uint8_t command){
 
  void husky_lens_protocol_write_int16(int16_t content){
      if(send_index + sizeof(content) >= FRAME_BUFFER_SIZE) {send_fail = 1; return;}
-     if (IS_BIG_ENDIAN()){__builtin_bswap16(content);}
+//     if (IS_BIG_ENDIAN()){__builtin_bswap16(content);}
      memcpy(send_buffer + send_index, &content, sizeof(content));
      send_index += sizeof(content);
  }
@@ -302,8 +314,15 @@ uint8_t* husky_lens_protocol_write_begin(uint8_t command){
      }
  }
 
+ uint32_t husky_lens_protocol_read_buffer_uint8(uint8_t *content, uint32_t length){
+     if (content_current >= content_end || content_read_end){receive_fail = 1; return 0;}
+     memcpy(content, receive_buffer + content_current, sizeof(uint8_t)*length);
+     content_current += sizeof(uint8_t)*length;
+     return length;
+ }
+
  //从结果中获取已学习的ID数
- float readLearnedIDCount(){
+ int16_t readLearnedIDCount(){
 	 return protocolInfo.knowledgeSize;
  }
 
@@ -369,7 +388,7 @@ HUSKYLENSBlockDirectInfo readBlockCenterParameterDirect(){
     return block;
 }
 
-HUSKYLENSArrowDirectInfo readArrowCenterParameterDirect(){
+void readArrowCenterParameterDirect(HUSKYLENSArrowDirectInfo*arrow){
     int32_t distanceMin = INT32_MAX;
     int16_t distanceMinIndex = -1;
     for (int i = 0; i <available(); i++){
@@ -382,13 +401,13 @@ HUSKYLENSArrowDirectInfo readArrowCenterParameterDirect(){
         }
     }
     HUSKYLENSResult result = readDirect(distanceMinIndex);
-    HUSKYLENSArrowDirectInfo arrow;
-    arrow.xOrigin = result.xOrigin;
-    arrow.yOrigin = result.yOrigin;
-    arrow.xTarget = result.xTarget;
-    arrow.yTarget = result.yTarget;
-    arrow.ID = result.ID;
-    return arrow;
+//    HUSKYLENSArrowDirectInfo arrow;
+    arrow->xOrigin = result.xOrigin;
+    arrow->yOrigin = result.yOrigin;
+    arrow->xTarget = result.xTarget;
+    arrow->yTarget = result.yTarget;
+    arrow->ID = result.ID;
+//    return arrow;
 }
 
 int available(){
@@ -613,7 +632,12 @@ uint8_t saveModelToTFCard(uint16_t index){
 }
 
 uint8_t loadModelFromTFCard(uint16_t index){
-
+    uint8_t data[] = {index & 0xff, (index >> 8) & 0xff};
+    Protocol_t protocol;
+    protocol.length = 2;
+    protocol.data = data;
+    protocolWriteRequestLoadModelFromTFCard(&protocol);
+    return 0;
 }
 
 //通信部分

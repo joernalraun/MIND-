@@ -263,15 +263,46 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-//  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-//  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-//  return (USBD_OK);
-	flag2=1;
-	memcpy(my_RxBuf,Buf,*Len);
-      my_RxLength=*Len;
-	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-	return 1;
+  uint32_t temp1;
+  if(((*Len)==4)&&(Buf[0]==0xf0)&&(Buf[0]==0xf0)&&(Buf[1]==0x0D)&&(Buf[3]==0xf7)){
+	  flag3=1;
+	  SIZE=Buf[2];
+  }else{
+	  my_RxLength=*Len;
+		if(my_RxLength<64){
+			valid_data=my_RxLength/4+count;
+			for(int i=0;i<(my_RxLength/4);i++){
+				temp1=0;
+				for(int j=0;j<4;j++){
+					temp1 |= ((Buf[4*i+j])<<(8*j));
+				}
+				writeFlashData[temp_count++]=temp1;
+			}
+			flag2=1;
+		}else{
+			for(int i=0;i<(my_RxLength/4);i++){
+				temp1=0;
+				for(int j=0;j<4;j++){
+					temp1 |= ((Buf[4*i+j])<<(8*j));
+				}
+				writeFlashData[temp_count++]=temp1;
+				count++;
+			}
+			if(temp_count>511){
+				valid_data=count;
+				flag2=1;
+				temp_count=0;
+				count=0;
+			}
+		}
+//	  for(int i=0;i<(*Len);i++){
+//		  my_RxBuf[i]=Buf[i];
+//	  }
+//	  my_RxLength=*Len;
+  }
+  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  uint8_t state = USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  return (USBD_OK);
   /* USER CODE END 6 */
 }
 
@@ -301,6 +332,20 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+//uint8_t fifoisfull(){
+//	if((head%MAXBUFFER)==((tail+1)%MAXBUFFER))
+//		return 1;
+//	else
+//		return 0;
+//}
+//
+//uint8_t fifoisempty(){
+//	if(head==tail)
+//		return 1;
+//	else
+//		return 0;
+//}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
